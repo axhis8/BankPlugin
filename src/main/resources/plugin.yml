@@ -1,0 +1,9 @@
+name: BankPlugin
+version: '${version}'
+
+main: com.axhislmc.bankPlugin.BankPlugin
+api-version: '1.21'
+load: POSTWORLD
+commands:
+  bank:
+    description: Bank Plugin System to manage the Economy of your Server.
