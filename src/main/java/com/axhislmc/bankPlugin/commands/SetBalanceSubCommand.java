@@ -1,6 +1,7 @@
 package com.axhislmc.bankPlugin.commands;
 
 import com.axhislmc.bankPlugin.BankPlugin;
+import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.SubCommand;
 import com.axhislmc.bankPlugin.utils.Message;
 import org.bukkit.command.CommandSender;
@@ -31,17 +32,12 @@ public class SetBalanceSubCommand implements SubCommand {
 
     @Override
     public List<String> getSubCommandArgs(CommandSender sender, String[] args) {
-        if (args.length == 2) {
-            Collection<? extends Player> playersOnServer = plugin.getServer().getOnlinePlayers();
-            ArrayList<String> onlinePlayerNames = new ArrayList<>();
 
-            for (Player p : playersOnServer) {
-                onlinePlayerNames.add(p.getName());
-            }
-            return StringUtil.copyPartialMatches(args[1], onlinePlayerNames, new ArrayList<>());
+        if (args.length == 2) {
+            return CommandManager.getOnlinePlayerNames(sender, true);
         }
 
-        if (args.length == 3) {
+        else if (args.length == 3) {
             List<String> moneySuggestions = List.of("100", "500", "1000", "5000");
             return StringUtil.copyPartialMatches(args[2], moneySuggestions, new ArrayList<>());
         }

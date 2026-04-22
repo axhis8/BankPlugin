@@ -6,6 +6,7 @@ import com.axhislmc.bankPlugin.commands.PaySubCommand;
 import com.axhislmc.bankPlugin.commands.SetBalanceSubCommand;
 import com.axhislmc.bankPlugin.menus.BankMenu;
 import com.axhislmc.bankPlugin.utils.Message;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -62,6 +63,17 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             }
         }
         return Collections.emptyList();
+    }
+
+    public static List<String> getOnlinePlayerNames(CommandSender sender, boolean includeSelf) {
+        List<String> names = new ArrayList<>();
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (!includeSelf && player.equals(sender)) {
+                continue;
+            }
+            names.add(player.getName());
+        }
+        return names;
     }
 
     private void registerSubCommand(SubCommand sub) {
