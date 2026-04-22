@@ -41,7 +41,7 @@ public class EconomyManager {
             config.save(file);
         } catch (IOException e) {
             plugin.getLogger().severe("Error saving Balances in File");
-            e.printStackTrace();
+            plugin.getLogger().severe(e.getMessage());
         }
     }
 
@@ -52,7 +52,7 @@ public class EconomyManager {
             config.load(file);
         } catch (IOException | InvalidConfigurationException e) {
             plugin.getLogger().severe("Error loading Balances from File");
-            e.printStackTrace();
+            plugin.getLogger().severe(e.getMessage());
         }
 
         ConfigurationSection section = config.getConfigurationSection("balances");
