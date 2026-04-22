@@ -2,18 +2,25 @@ package com.axhislmc.bankPlugin;
 
 import com.axhislmc.bankPlugin.listeners.PlayerListener;
 import com.axhislmc.bankPlugin.managers.CommandManager;
+import com.axhislmc.bankPlugin.managers.DatabaseManager;
 import com.axhislmc.bankPlugin.managers.EconomyManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class BankPlugin extends JavaPlugin {
 
     private EconomyManager economyManager;
+    private DatabaseManager databaseManager;
+
+    @Override
+    public void onLoad() {
+        this.databaseManager = new DatabaseManager(this);
+        databaseManager.load();
+    }
 
     @Override
     public void onEnable() {
 
         this.economyManager = new EconomyManager(this);
-        economyManager.load();
 
         CommandManager commandManager = new CommandManager(this);
         commandManager.setupCommands();
@@ -21,7 +28,7 @@ public final class BankPlugin extends JavaPlugin {
         getCommand("bank").setExecutor(commandManager);
         getCommand("bank").setTabCompleter(commandManager);
 
-        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
         getLogger().info("Successfully started Bank Plugin.");
     }
@@ -30,9 +37,13 @@ public final class BankPlugin extends JavaPlugin {
         return economyManager;
     }
 
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
+    }
+
     @Override
     public void onDisable() {
-        economyManager.save();
+        databaseManager.close();
         getLogger().info("Safely disabled Bank Plugin.");
     }
 }

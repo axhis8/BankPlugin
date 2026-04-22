@@ -1,5 +1,4 @@
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.tasks
+import org.gradle.kotlin.dsl.implementation
 
 plugins {
     id("java-library")
@@ -34,4 +33,8 @@ tasks {
             expand(props)
         }
     }
+}
+
+dependencies {
+    compileOnly("com.zaxxer:HikariCP:6.2.1")
 }

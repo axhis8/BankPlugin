@@ -2,93 +2,52 @@ package com.axhislmc.bankPlugin.managers;
 
 import com.axhislmc.bankPlugin.BankPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class EconomyManager {
 
     private final BankPlugin plugin;
-    private final Map<UUID, Double> balances = new HashMap<>();
-    private final File file;
-    private final FileConfiguration config;
 
+    private final Map<UUID, Double> cachedBalances = new HashMap<>();
     private List<Map.Entry<UUID, Double>> cachedTopList;
-    private long lastUpdate;
+    private long lastTopUpdate;
+
+    private final int SHOWED_TOP_PLAYERS = 10;
 
     public EconomyManager(BankPlugin plugin) {
         this.plugin = plugin;
-
-        this.file = new File(plugin.getDataFolder(), "balances.yml");
-        this.config = YamlConfiguration.loadConfiguration(file);
     }
 
-    public void save() {
-        // So that if in the same time while saving the balances map is modified, it won't crash because of the snapshot
-        Map<UUID, Double> snapshot = new HashMap<>(balances);
-
-        config.set("balances", null);
-        for (Map.Entry<UUID, Double> set : snapshot.entrySet()) {
-            config.set("balances."+ set.getKey(), set.getValue());
-        }
-
-        try {
-            config.save(file);
-        } catch (IOException e) {
-            plugin.getLogger().severe("Error saving Balances in File");
-            plugin.getLogger().severe(e.getMessage());
-        }
+    public void loadPlayer(UUID uuid) {
+        double balance = plugin.getDatabaseManager().getBalance(uuid);
+        cachedBalances.put(uuid, balance);
     }
 
-    public void load() {
-        if (!file.exists()) return;
-
-        try {
-            config.load(file);
-        } catch (IOException | InvalidConfigurationException e) {
-            plugin.getLogger().severe("Error loading Balances from File");
-            plugin.getLogger().severe(e.getMessage());
-        }
-
-        ConfigurationSection section = config.getConfigurationSection("balances");
-        if (section != null) {
-
-            for (String key : section.getKeys(false)) {
-                UUID playerUUID = UUID.fromString(key);
-                double playerBalance = section.getDouble(key);
-
-                balances.put(playerUUID, playerBalance);
-            }
-            plugin.getLogger().info("Successfully loaded balances.");
-        }
+    public void unloadPlayer(UUID uuid) {
+        cachedBalances.remove(uuid);
     }
 
     public List<Map.Entry<UUID, Double>> getTopBalances() {
-        long CACHE_INTERVAL = 5 * 60 * 1000; // 5 Minutes
+        long INTERVAL = 5 * 60 * 1000;
 
-        if (cachedTopList == null || (System.currentTimeMillis() - lastUpdate) > CACHE_INTERVAL) {
-            cachedTopList = new ArrayList<>(balances.entrySet());
-
-            cachedTopList.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
-            lastUpdate = System.currentTimeMillis();
-
-            plugin.getLogger().info("Top-List was new generated.");
+        if(cachedTopList == null || (System.currentTimeMillis() - lastTopUpdate) > INTERVAL) {
+            this.cachedTopList = plugin.getDatabaseManager().getTopList(SHOWED_TOP_PLAYERS);
+            this.lastTopUpdate = System.currentTimeMillis();
+            plugin.getLogger().info("Updated Top Richest Players!");
         }
         return cachedTopList;
     }
 
     public double getBalance(UUID uuid) {
-        return balances.getOrDefault(uuid, 0.0);
+        return cachedBalances.getOrDefault(uuid, plugin.getDatabaseManager().getBalance(uuid));
     }
 
     public void setBalance(UUID uuid, double amount) {
-        balances.put(uuid, amount);
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, this::save);
+        cachedBalances.put(uuid, amount);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
+                plugin.getDatabaseManager().setBalance(uuid, amount)
+        );
     }
 
     public void addMoney(UUID uuid, double amount) {
