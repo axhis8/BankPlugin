@@ -4,12 +4,13 @@ import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.commands.BalanceSubCommand;
 import com.axhislmc.bankPlugin.commands.PaySubCommand;
 import com.axhislmc.bankPlugin.commands.SetBalanceSubCommand;
+import com.axhislmc.bankPlugin.menus.BankMenu;
 import com.axhislmc.bankPlugin.utils.Message;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-
+import org.bukkit.entity.Player;
 
 import java.util.*;
 
@@ -29,12 +30,21 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
         if (args.length > 0) {
             SubCommand target = subCommands.get(args[0].toLowerCase());
             if (target != null){
                 target.perform(sender, args);
             } else {
                 Message.INVALID_COMMAND.send(sender);
+            }
+        }
+
+        else {
+            if (sender instanceof Player player) {
+                new BankMenu(plugin, player).open();
+            } else {
+                Message.NOT_A_PLAYER.send(sender);
             }
         }
 

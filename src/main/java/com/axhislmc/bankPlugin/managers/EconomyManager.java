@@ -26,7 +26,7 @@ public class EconomyManager {
     }
 
     public void save() {
-        // So that if in the same time while saving the balances map is modified, it won't crash because of the snapshop
+        // So that if in the same time while saving the balances map is modified, it won't crash because of the snapshot
         Map<UUID, Double> snapshot = new HashMap<>(balances);
 
         config.set("balances", null);
@@ -61,7 +61,7 @@ public class EconomyManager {
 
                 balances.put(playerUUID, playerBalance);
             }
-            plugin.getLogger().info("Successfully loaded balances-");
+            plugin.getLogger().info("Successfully loaded balances.");
         }
     }
 

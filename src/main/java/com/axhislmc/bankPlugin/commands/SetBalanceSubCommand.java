@@ -54,7 +54,8 @@ public class SetBalanceSubCommand implements SubCommand {
         if (!sender.isOp()) {
             Message.NO_PERMISSION.send(sender);
         } else {
-            // Checks if Amount is given
+
+            // /bank setbalance <Player> <amount>
             if (args.length == 3) {
 
                 // Checks if Player exists
@@ -64,24 +65,43 @@ public class SetBalanceSubCommand implements SubCommand {
                     return;
                 }
 
-                // Checks valid Type
-                try {
-                    double amount = Double.parseDouble(args[2]);
+                executeSetBalance(sender, args[2], target);
+            }
 
-                    // Checks valid Amount
-                    if (amount < 0) {
-                        return;
-                    }
+            // /bank setbalance <amount> -> for itself
+            else if (args.length == 2) {
+                if (sender instanceof Player) executeSetBalance(sender, args[1], null);
+                else Message.NOT_A_PLAYER.send(sender);
+            }
 
-                    plugin.getEconomyManager().setBalance(target.getUniqueId(), amount);
-                    Message.SET_BALANCE.send(sender, String.valueOf(amount));
-                } catch (NumberFormatException e) {
-                    Message.NO_AMOUNT_GIVEN.send(sender);
-                }
-
-            } else {
+            else {
                 Message.INVALID_COMMAND.send(sender);
             }
+        }
+    }
+
+    private void executeSetBalance(CommandSender sender, String amountAsString, Player target) {
+        // Checks valid Type
+        try {
+            double amount = Double.parseDouble(amountAsString);
+            if (amount < 0) {
+                Message.AMOUNT_NEGATIVE.send(sender);
+                return;
+            }
+
+            if (target == null) {
+                target = (Player) sender;
+            }
+
+            plugin.getEconomyManager().setBalance(target.getUniqueId(), amount);
+            if (target != sender) {
+                Message.SET_BALANCE.send(sender, target.getName(), String.format("%.2f", amount));
+                Message.TARGET_SET_BALANCE.send(target, String.format("%.2f", amount));
+            } else {
+                Message.SET_BALANCE.send(sender, "your", String.format("%.2f", amount));
+            }
+        } catch (NumberFormatException e) {
+            Message.NO_AMOUNT_GIVEN.send(sender);
         }
     }
 }

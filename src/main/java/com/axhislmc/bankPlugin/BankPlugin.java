@@ -1,5 +1,6 @@
 package com.axhislmc.bankPlugin;
 
+import com.axhislmc.bankPlugin.listeners.PlayerListener;
 import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.EconomyManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,6 +20,8 @@ public final class BankPlugin extends JavaPlugin {
 
         getCommand("bank").setExecutor(commandManager);
         getCommand("bank").setTabCompleter(commandManager);
+
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
         getLogger().info("Successfully started Bank Plugin!");
     }

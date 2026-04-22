@@ -48,7 +48,7 @@ public class BalanceSubCommand implements SubCommand {
         if (args.length == 1) {
             if (sender instanceof Player player) {
                 double balance = plugin.getEconomyManager().getBalance(player.getUniqueId());
-                Message.BALANCE_INFO.send(sender, String.valueOf(balance));
+                Message.BALANCE_INFO.send(sender, String.format("%.2f", balance));
             } else {
                 Message.NOT_A_PLAYER.send(sender);
             }
@@ -57,7 +57,7 @@ public class BalanceSubCommand implements SubCommand {
             Player target = plugin.getServer().getPlayer(args[1]);
             if (target != null) {
                 double balance = plugin.getEconomyManager().getBalance(target.getUniqueId());
-                Message.OTHER_BALANCE_INFO.send(sender, String.valueOf(balance));
+                Message.OTHER_BALANCE_INFO.send(sender, target.getName(), String.format("%.2f", balance));
             } else {
                 Message.PLAYER_DOESNT_EXIST.send(sender, args[1]);
             }

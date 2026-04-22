@@ -36,6 +36,7 @@ public class PaySubCommand implements SubCommand {
             ArrayList<String> onlinePlayerNames = new ArrayList<>();
 
             for (Player p : playersOnServer) {
+                if (p != sender) onlinePlayerNames.add(p.getName()); // to not get suggested with itself
                 onlinePlayerNames.add(p.getName());
             }
             return StringUtil.copyPartialMatches(args[1], onlinePlayerNames, new ArrayList<>());
@@ -51,7 +52,7 @@ public class PaySubCommand implements SubCommand {
 
     @Override
     public void perform(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             Message.NOT_A_PLAYER.send(sender);
             return;
         }
@@ -66,21 +67,28 @@ public class PaySubCommand implements SubCommand {
                 return;
             }
 
+            else if (target == player) {
+                Message.SELF_PAY.send(sender);
+                return;
+            }
+
             // Checks valid Type
             try {
                 double amount = Double.parseDouble(args[2]);
 
                 // Checks valid Amount
                 if (amount <= 0) {
+                    Message.AMOUNT_NEGATIVE.send(sender);
                     return;
                 }
 
                 // Checks the Transfer
-                if (plugin.getEconomyManager().removeMoney(((Player) sender).getUniqueId(), amount)) {
+                if (plugin.getEconomyManager().removeMoney(player.getUniqueId(), amount)) {
                     plugin.getEconomyManager().addMoney(target.getUniqueId(), amount);
-                    Message.TRANSFERRED_MONEY.send(sender, String.valueOf(amount));
+                    Message.TRANSFERRED_MONEY.send(sender, String.format("%.2f", amount), target.getName());
+                    Message.RECEIVED_MONEY.send(target, String.format("%.2f", amount), sender.getName());
                 } else {
-                    Message.NOT_ENOUGH_MONEY.send(sender);
+                    Message.NOT_ENOUGH_MONEY.send(sender, String.format("%.2f", amount));
                 }
 
             } catch (NumberFormatException e) {
