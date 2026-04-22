@@ -12,6 +12,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class BankMenu {
     private final Inventory bankMenu;
@@ -25,7 +27,7 @@ public class BankMenu {
 
         bankMenu.setItem(12, getPayItem());
         bankMenu.setItem(13, getBalanceItem());
-        bankMenu.setItem(14, getHelpItem());
+        bankMenu.setItem(14, getTopItem());
         setGlassBorder();
     }
 
@@ -36,7 +38,7 @@ public class BankMenu {
     private void setGlassBorder() {
         ItemStack greyGlassPane = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta meta = greyGlassPane.getItemMeta();
-        meta.displayName(Component.empty());
+        meta.setHideTooltip(true);
         greyGlassPane.setItemMeta(meta);
 
         for (int i = 0; i < 9; i++) {
@@ -77,18 +79,30 @@ public class BankMenu {
         return balanceItem;
     }
 
-    private ItemStack getHelpItem() {
-        ItemStack helpItem = new ItemStack(Material.PAPER);
+    private ItemStack getTopItem() {
+        ItemStack topItem = new ItemStack(Material.ENCHANTED_GOLDEN_APPLE);
 
-        ItemMeta helpItemMetaData = helpItem.getItemMeta();
-        helpItemMetaData.displayName(mm("<!i><b><grey>Help"));
+        ItemMeta topItemMetaData = topItem.getItemMeta();
+        topItemMetaData.displayName(mm("<!i><b><dark_green>Top Players"));
 
-        List<Component> helpItemLore = new ArrayList<>();
-        helpItemLore.add(mm("this command is under development"));
-        helpItemMetaData.lore(helpItemLore);
+        List<Component> topItemLore = new ArrayList<>();
+        List<Map.Entry<UUID, Double>> balanceTopList = plugin.getEconomyManager().getTopBalances();
+        int limit = Math.min(10, balanceTopList.size());
 
-        helpItem.setItemMeta(helpItemMetaData);
-        return helpItem;
+        for (int i = 0; i < limit; i++) {
+            Map.Entry<UUID, Double> entry = balanceTopList.get(i);
+            if (entry == null || entry.getKey() == null) continue;
+
+            String playerName = plugin.getServer().getOfflinePlayer(entry.getKey()).getName();
+            if (playerName == null) playerName = "Unknown";
+
+            topItemLore.add(mm(String.format("<!i><grey>%d. <white>%s<white>: <green>%.2f$", (i + 1), playerName, entry.getValue())));
+        }
+
+        topItemMetaData.lore(topItemLore);
+
+        topItem.setItemMeta(topItemMetaData);
+        return topItem;
     }
 
     private Component mm(String text) {
