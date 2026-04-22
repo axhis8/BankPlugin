@@ -18,6 +18,9 @@ public class EconomyManager {
     private final File file;
     private final FileConfiguration config;
 
+    private List<Map.Entry<UUID, Double>> cachedTopList;
+    private long lastUpdate;
+
     public EconomyManager(BankPlugin plugin) {
         this.plugin = plugin;
 
@@ -63,6 +66,20 @@ public class EconomyManager {
             }
             plugin.getLogger().info("Successfully loaded balances.");
         }
+    }
+
+    public List<Map.Entry<UUID, Double>> getTopBalances() {
+        long CACHE_INTERVAL = 5 * 60 * 1000; // 5 Minutes
+
+        if (cachedTopList == null || (System.currentTimeMillis() - lastUpdate) > CACHE_INTERVAL) {
+            cachedTopList = new ArrayList<>(balances.entrySet());
+
+            cachedTopList.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+            lastUpdate = System.currentTimeMillis();
+
+            plugin.getLogger().info("Top-List was new generated.");
+        }
+        return cachedTopList;
     }
 
     public double getBalance(UUID uuid) {

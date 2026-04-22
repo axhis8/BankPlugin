@@ -1,7 +1,6 @@
 package com.axhislmc.bankPlugin.menus;
 
 import com.axhislmc.bankPlugin.BankPlugin;
-import com.axhislmc.bankPlugin.utils.Message;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
@@ -20,8 +19,7 @@ public class BankMenu {
     private final Player player;
 
     public BankMenu(BankPlugin plugin, Player player) {
-        this.bankMenu = Bukkit.createInventory(new BankMenuHolder(), 27,
-                MiniMessage.miniMessage().deserialize("<b><dark_green>Bank"));
+        this.bankMenu = Bukkit.createInventory(new BankMenuHolder(), 27, mm("<b><dark_green>Bank"));
         this.plugin = plugin;
         this.player = player;
 
@@ -54,10 +52,10 @@ public class BankMenu {
         ItemStack payItem = new ItemStack(Material.PLAYER_HEAD);
 
         ItemMeta payItemMetaData = payItem.getItemMeta();
-        payItemMetaData.displayName(MiniMessage.miniMessage().deserialize("<!i><b><yellow>Pay"));
+        payItemMetaData.displayName(mm("<!i><b><yellow>Pay"));
 
         List<Component> payItemLore = new ArrayList<>();
-        payItemLore.add(Message.PAY_LORE.asComponent());
+        payItemLore.add(mm("<grey>Type <white>/bank pay <Player> <amount></white> in chat to pay."));
         payItemMetaData.lore(payItemLore);
 
         payItem.setItemMeta(payItemMetaData);
@@ -68,10 +66,10 @@ public class BankMenu {
         ItemStack balanceItem = new ItemStack(Material.GOLD_INGOT);
 
         ItemMeta balanceItemMetaData = balanceItem.getItemMeta();
-        balanceItemMetaData.displayName(MiniMessage.miniMessage().deserialize("<!i><b><aqua>Balance"));
+        balanceItemMetaData.displayName(mm("<!i><b><aqua>Balance"));
 
         List<Component> balanceItemLore = new ArrayList<>();
-        balanceItemLore.add(MiniMessage.miniMessage().deserialize(String.format("<grey>Your balance: <!i><green>%.2f$",
+        balanceItemLore.add(mm(String.format("<grey>Your balance: <!i><green>%.2f$",
                 plugin.getEconomyManager().getBalance(player.getUniqueId()))));
         balanceItemMetaData.lore(balanceItemLore);
 
@@ -83,13 +81,17 @@ public class BankMenu {
         ItemStack helpItem = new ItemStack(Material.PAPER);
 
         ItemMeta helpItemMetaData = helpItem.getItemMeta();
-        helpItemMetaData.displayName(MiniMessage.miniMessage().deserialize("<!i><b><grey>Help"));
+        helpItemMetaData.displayName(mm("<!i><b><grey>Help"));
 
         List<Component> helpItemLore = new ArrayList<>();
-        helpItemLore.add(Component.text("this command is under development"));
+        helpItemLore.add(mm("this command is under development"));
         helpItemMetaData.lore(helpItemLore);
 
         helpItem.setItemMeta(helpItemMetaData);
         return helpItem;
+    }
+
+    private Component mm(String text) {
+        return MiniMessage.miniMessage().deserialize(text);
     }
 }

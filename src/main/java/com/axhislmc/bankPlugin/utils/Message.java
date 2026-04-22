@@ -1,6 +1,5 @@
 package com.axhislmc.bankPlugin.utils;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,10 +22,7 @@ public enum Message {
     TRANSFERRED_MONEY("<grey>Successfully transferred <green>%value%$</green> to %value%.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
     RECEIVED_MONEY("<grey>You received %value%$ from %value%!", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
     SET_BALANCE("<grey>Successfully set %value% balance to <green>%value%$</green>.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
-    TARGET_SET_BALANCE("<grey>Your balance was set to <green>%value%$</green>.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
-
-    // LORE
-    PAY_LORE("<grey>Click or type <white>/bank pay <Player> <amount></white> to pay.", null);
+    TARGET_SET_BALANCE("<grey>Your balance was set to <green>%value%$</green>.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP);
 
     private final String text;
     private final Sound sound;
@@ -43,12 +39,6 @@ public enum Message {
         if (sender instanceof Player player) {
             player.playSound(player.getLocation(), sound, 0.5f, 1f);
         }
-    }
-
-    public Component asComponent(String... replacements) {
-        String finalText = checkReplacements(replacements);
-
-        return net.kyori.adventure.text.minimessage.MiniMessage.miniMessage().deserialize(finalText);
     }
 
     private String checkReplacements(String... replacements) {

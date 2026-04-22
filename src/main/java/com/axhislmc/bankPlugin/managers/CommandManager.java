@@ -4,6 +4,7 @@ import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.commands.BalanceSubCommand;
 import com.axhislmc.bankPlugin.commands.PaySubCommand;
 import com.axhislmc.bankPlugin.commands.SetBalanceSubCommand;
+import com.axhislmc.bankPlugin.commands.TopSubCommand;
 import com.axhislmc.bankPlugin.menus.BankMenu;
 import com.axhislmc.bankPlugin.utils.Message;
 import org.bukkit.Bukkit;
@@ -17,7 +18,7 @@ import java.util.*;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
     private final BankPlugin plugin;
-    private final Map<String, SubCommand> subCommands = new LinkedHashMap<>();
+    private final Map<String, SubCommand> subCommands = new HashMap<>();
 
     public CommandManager(BankPlugin plugin) {
         this.plugin = plugin;
@@ -27,6 +28,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         registerSubCommand(new BalanceSubCommand(plugin));
         registerSubCommand(new PaySubCommand(plugin));
         registerSubCommand(new SetBalanceSubCommand(plugin));
+        registerSubCommand(new TopSubCommand(plugin));
     }
 
     @Override

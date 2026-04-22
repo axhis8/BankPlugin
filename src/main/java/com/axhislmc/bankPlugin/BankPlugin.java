@@ -23,7 +23,7 @@ public final class BankPlugin extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
-        getLogger().info("Successfully started Bank Plugin!");
+        getLogger().info("Successfully started Bank Plugin.");
     }
 
     public EconomyManager getEconomyManager() {
