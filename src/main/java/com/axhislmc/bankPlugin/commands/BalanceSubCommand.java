@@ -24,7 +24,7 @@ public class BalanceSubCommand implements SubCommand {
 
     @Override
     public String getDescription() {
-        return "Show your balance or type a Players name to show their balance.";
+        return "Shows yours are someone else's balance";
     }
 
     @Override

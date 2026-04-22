@@ -26,7 +26,7 @@ public class PaySubCommand implements SubCommand {
 
     @Override
     public String getDescription() {
-        return "Pays an amount to a Player with /pay <Player> <amount>";
+        return "Pays a Player an amount with /bank pay <Player> <amount>";
     }
 
     @Override

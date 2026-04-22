@@ -1,10 +1,7 @@
 package com.axhislmc.bankPlugin.managers;
 
 import com.axhislmc.bankPlugin.BankPlugin;
-import com.axhislmc.bankPlugin.commands.BalanceSubCommand;
-import com.axhislmc.bankPlugin.commands.PaySubCommand;
-import com.axhislmc.bankPlugin.commands.SetBalanceSubCommand;
-import com.axhislmc.bankPlugin.commands.TopSubCommand;
+import com.axhislmc.bankPlugin.commands.*;
 import com.axhislmc.bankPlugin.menus.BankMenu;
 import com.axhislmc.bankPlugin.utils.Message;
 import org.bukkit.Bukkit;
@@ -13,22 +10,25 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import java.util.*;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
     private final BankPlugin plugin;
     private final Map<String, SubCommand> subCommands = new HashMap<>();
+    private final List<SubCommand> opCommands = new ArrayList<>();
 
     public CommandManager(BankPlugin plugin) {
         this.plugin = plugin;
     }
 
     public void setupCommands() {
-        registerSubCommand(new BalanceSubCommand(plugin));
-        registerSubCommand(new PaySubCommand(plugin));
-        registerSubCommand(new SetBalanceSubCommand(plugin));
-        registerSubCommand(new TopSubCommand(plugin));
+        registerSubCommand(new BalanceSubCommand(plugin), false);
+        registerSubCommand(new PaySubCommand(plugin), false);
+        registerSubCommand(new SetBalanceSubCommand(plugin), true);
+        registerSubCommand(new TopSubCommand(plugin), false);
+        registerSubCommand(new HelpSubCommand(subCommands, opCommands), false);
     }
 
     @Override
@@ -56,9 +56,21 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+
         if (args.length == 1) {
-            return new ArrayList<>(subCommands.keySet());
-        } else if (args.length > 1) {
+            List<String> completions = new ArrayList<>();
+
+            for (SubCommand sub : subCommands.values()) {
+                if (opCommands.contains(sub) && !sender.isOp()) {
+                    continue;
+                }
+                completions.add(sub.getCommand());
+            }
+
+            return StringUtil.copyPartialMatches(args[0], completions, new ArrayList<>());
+        }
+
+        else if (args.length > 1) {
             SubCommand target = subCommands.get(args[0].toLowerCase());
             if (target != null) {
                 return target.getSubCommandArgs(sender, args);
@@ -78,7 +90,10 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         return names;
     }
 
-    private void registerSubCommand(SubCommand sub) {
+    private void registerSubCommand(SubCommand sub, boolean isOp) {
         subCommands.put(sub.getCommand(), sub);
+        if (isOp) {
+            opCommands.add(sub);
+        }
     }
 }
