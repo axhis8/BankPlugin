@@ -2,8 +2,8 @@ package com.axhislmc.bankPlugin.managers;
 
 import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.commands.*;
+import com.axhislmc.bankPlugin.config.MessageType;
 import com.axhislmc.bankPlugin.menus.BankMenu;
-import com.axhislmc.bankPlugin.utils.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -13,6 +13,7 @@ import java.util.*;
 
 public class CommandManager implements TabExecutor {
     private final BankPlugin plugin;
+
     private final Map<String, SubCommand> subCommands = new HashMap<>();
     private final List<SubCommand> opCommands = new ArrayList<>();
 
@@ -36,7 +37,7 @@ public class CommandManager implements TabExecutor {
             if (target != null){
                 target.perform(sender, args);
             } else {
-                Message.INVALID_COMMAND.send(sender);
+                plugin.getMessages().send(sender, MessageType.INVALID_COMMAND);
             }
         }
 
@@ -44,7 +45,7 @@ public class CommandManager implements TabExecutor {
             if (sender instanceof Player player) {
                 new BankMenu(plugin, player).open();
             } else {
-                Message.NOT_A_PLAYER.send(sender);
+                plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
             }
         }
 

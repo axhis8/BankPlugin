@@ -1,9 +1,11 @@
 package com.axhislmc.bankPlugin.commands;
 
 import com.axhislmc.bankPlugin.BankPlugin;
+import com.axhislmc.bankPlugin.config.MessageType;
 import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.SubCommand;
-import com.axhislmc.bankPlugin.utils.Message;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -46,7 +48,7 @@ public class PaySubCommand implements SubCommand {
     @Override
     public void perform(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            Message.NOT_A_PLAYER.send(sender);
+            plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
             return;
         }
 
@@ -56,12 +58,13 @@ public class PaySubCommand implements SubCommand {
             // Checks if Player exists
             Player target = plugin.getServer().getPlayer(args[1]);
             if (target == null) {
-                Message.PLAYER_DOESNT_EXIST.send(sender, args[1]);
+                TagResolver unknownTag = Placeholder.parsed("target", args[1]);
+                plugin.getMessages().send(sender, MessageType.PLAYER_DOESNT_EXIST, unknownTag);
                 return;
             }
 
             else if (target == player) {
-                Message.SELF_PAY.send(sender);
+                plugin.getMessages().send(sender, MessageType.SELF_PAY);
                 return;
             }
 
@@ -71,25 +74,32 @@ public class PaySubCommand implements SubCommand {
 
                 // Checks valid Amount
                 if (amount <= 0) {
-                    Message.AMOUNT_NEGATIVE.send(sender);
+                    plugin.getMessages().send(sender, MessageType.AMOUNT_IS_NEGATIVE);
                     return;
                 }
+
+                TagResolver amountTag = Placeholder.parsed("amount", String.valueOf(amount));
 
                 // Checks the Transfer
                 if (plugin.getEconomyManager().removeMoney(player.getUniqueId(), amount)) {
                     plugin.getEconomyManager().addMoney(target.getUniqueId(), amount);
-                    Message.TRANSFERRED_MONEY.send(sender, String.format("%.2f", amount), target.getName());
-                    Message.RECEIVED_MONEY.send(target, String.format("%.2f", amount), sender.getName());
+
+                    TagResolver targetTag = Placeholder.parsed("target", target.getName());
+                    TagResolver playerTag = Placeholder.parsed("player", sender.getName());
+
+                    plugin.getMessages().send(sender, MessageType.MONEY_TRANSFERRED, amountTag, targetTag);
+                    plugin.getMessages().send(sender, MessageType.MONEY_RECEIVED, amountTag, playerTag);
+
                 } else {
-                    Message.NOT_ENOUGH_MONEY.send(sender, String.format("%.2f", amount));
+                    plugin.getMessages().send(sender, MessageType.NOT_ENOUGH_MONEY, amountTag);
                 }
 
             } catch (NumberFormatException e) {
-                Message.NO_AMOUNT_GIVEN.send(sender);
+                plugin.getMessages().send(sender, MessageType.NO_AMOUNT_GIVEN);
             }
 
         } else {
-            Message.INVALID_COMMAND.send(sender);
+            plugin.getMessages().send(sender, MessageType.INVALID_COMMAND);
         }
     }
 }

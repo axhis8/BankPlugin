@@ -1,9 +1,11 @@
 package com.axhislmc.bankPlugin.commands;
 
 import com.axhislmc.bankPlugin.BankPlugin;
+import com.axhislmc.bankPlugin.config.MessageType;
 import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.SubCommand;
-import com.axhislmc.bankPlugin.utils.Message;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -40,18 +42,22 @@ public class BalanceSubCommand implements SubCommand {
         if (args.length == 1) {
             if (sender instanceof Player player) {
                 double balance = plugin.getEconomyManager().getBalance(player.getUniqueId());
-                Message.BALANCE_INFO.send(sender, String.format("%.2f", balance));
+
+                TagResolver amountTag = Placeholder.parsed("amount", String.valueOf(balance));
+                plugin.getMessages().send(sender, MessageType.SHOW_BALANCE, amountTag);
             } else {
-                Message.NOT_A_PLAYER.send(sender);
+                plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
             }
         }
         else if (args.length == 2) {
             Player target = plugin.getServer().getPlayer(args[1]);
             if (target != null) {
                 double balance = plugin.getEconomyManager().getBalance(target.getUniqueId());
-                Message.OTHER_BALANCE_INFO.send(sender, target.getName(), String.format("%.2f", balance));
+
+                TagResolver amountTag = Placeholder.parsed("amount", String.valueOf(balance));
+                plugin.getMessages().send(sender, MessageType.SHOW_BALANCE, amountTag);
             } else {
-                Message.PLAYER_DOESNT_EXIST.send(sender, args[1]);
+                plugin.getMessages().send(sender, MessageType.PLAYER_DOESNT_EXIST);
             }
         }
     }

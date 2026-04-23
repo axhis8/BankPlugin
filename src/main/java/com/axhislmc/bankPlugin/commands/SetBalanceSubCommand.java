@@ -1,9 +1,11 @@
 package com.axhislmc.bankPlugin.commands;
 
 import com.axhislmc.bankPlugin.BankPlugin;
+import com.axhislmc.bankPlugin.config.MessageType;
 import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.SubCommand;
-import com.axhislmc.bankPlugin.utils.Message;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -47,7 +49,7 @@ public class SetBalanceSubCommand implements SubCommand {
     @Override
     public void perform(CommandSender sender, String[] args) {
         if (!sender.isOp()) {
-            Message.NO_PERMISSION.send(sender);
+            plugin.getMessages().send(sender, MessageType.NO_PERMISSION);
         } else {
 
             // /bank setbalance <Player> <amount>
@@ -56,7 +58,8 @@ public class SetBalanceSubCommand implements SubCommand {
                 // Checks if Player exists
                 Player target = plugin.getServer().getPlayer(args[1]);
                 if (target == null) {
-                    Message.PLAYER_DOESNT_EXIST.send(sender, args[1]);
+                    TagResolver targetTag = Placeholder.parsed("target", args[1]);
+                    plugin.getMessages().send(sender, MessageType.PLAYER_DOESNT_EXIST, targetTag);
                     return;
                 }
 
@@ -66,11 +69,11 @@ public class SetBalanceSubCommand implements SubCommand {
             // /bank setbalance <amount> -> for itself
             else if (args.length == 2) {
                 if (sender instanceof Player) executeSetBalance(sender, args[1], null);
-                else Message.NOT_A_PLAYER.send(sender);
+                else plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
             }
 
             else {
-                Message.INVALID_COMMAND.send(sender);
+                plugin.getMessages().send(sender, MessageType.INVALID_COMMAND);
             }
         }
     }
@@ -80,7 +83,7 @@ public class SetBalanceSubCommand implements SubCommand {
         try {
             double amount = Double.parseDouble(amountAsString);
             if (amount < 0) {
-                Message.AMOUNT_NEGATIVE.send(sender);
+                plugin.getMessages().send(sender, MessageType.AMOUNT_IS_NEGATIVE);
                 return;
             }
 
@@ -88,15 +91,20 @@ public class SetBalanceSubCommand implements SubCommand {
                 target = (Player) sender;
             }
 
+            TagResolver amountTag = Placeholder.parsed("amount", String.valueOf(amount));
+            TagResolver targetTag = Placeholder.parsed("target", target.getName());
+            TagResolver selfTag = Placeholder.parsed("target", "your");
+
             plugin.getEconomyManager().setBalance(target.getUniqueId(), amount);
             if (target != sender) {
-                Message.SET_BALANCE.send(sender, target.getName(), String.format("%.2f", amount));
-                Message.TARGET_SET_BALANCE.send(target, String.format("%.2f", amount));
+                plugin.getMessages().send(sender, MessageType.SET_BALANCE, targetTag, amountTag);
+                plugin.getMessages().send(sender, MessageType.TARGET_SET_BALANCE, amountTag);
+
             } else {
-                Message.SET_BALANCE.send(sender, "your", String.format("%.2f", amount));
+                plugin.getMessages().send(sender, MessageType.SET_BALANCE, selfTag, amountTag);
             }
         } catch (NumberFormatException e) {
-            Message.NO_AMOUNT_GIVEN.send(sender);
+            plugin.getMessages().send(sender, MessageType.NO_AMOUNT_GIVEN);
         }
     }
 }

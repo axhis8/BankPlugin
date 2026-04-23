@@ -33,7 +33,7 @@ public class TopSubCommand implements SubCommand {
         List<Map.Entry<UUID, Double>> balanceTopList = plugin.getEconomyManager().getTopBalances();
 
         int limit = Math.min(10, balanceTopList.size());
-        sender.sendRichMessage("<grey>-- <yellow>Top " + limit + " richest Players</yellow> --");
+        sender.sendRichMessage("<grey><bold>-- <yellow>Top " + limit + " richest Players</yellow> --");
 
         for (int i = 0; i < limit; i++) {
             Map.Entry<UUID, Double> entry = balanceTopList.get(i);
