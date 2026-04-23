@@ -78,7 +78,7 @@ public class PaySubCommand implements SubCommand {
                     return;
                 }
 
-                TagResolver amountTag = Placeholder.parsed("amount", String.valueOf(amount));
+                TagResolver amountTag = Placeholder.parsed("amount", String.format("%.2f", amount));
 
                 // Checks the Transfer
                 if (plugin.getEconomyManager().removeMoney(player.getUniqueId(), amount)) {

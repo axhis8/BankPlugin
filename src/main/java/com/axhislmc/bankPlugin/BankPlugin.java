@@ -20,11 +20,11 @@ public final class BankPlugin extends JavaPlugin {
         this.databaseManager = new DatabaseManager(this);
         databaseManager.load();
 
-        saveResource("messages.yml", false);
     }
 
     @Override
     public void onEnable() {
+        saveDefaultMessages();
 
         this.messages = new Messages(this, new File(getDataFolder(), "messages.yml"));
         this.economyManager = new EconomyManager(this);
@@ -56,5 +56,12 @@ public final class BankPlugin extends JavaPlugin {
     public void onDisable() {
         databaseManager.close();
         getLogger().info("Safely disabled Bank Plugin.");
+    }
+
+    private void saveDefaultMessages() {
+        File file = new File(getDataFolder(), "messages.yml");
+        if (!file.exists()) {
+            saveResource("messages.yml", false);
+        }
     }
 }

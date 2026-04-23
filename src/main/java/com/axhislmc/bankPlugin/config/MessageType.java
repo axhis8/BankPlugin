@@ -25,7 +25,8 @@ public enum MessageType {
     MONEY_TRANSFERRED("Money-Transferred", "<grey>Successfully transferred <green><amount>$</green> to <target>.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
     MONEY_RECEIVED("Money-Received", "<grey>You received <amount>$ from <player>!", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
     SET_BALANCE("Set-Balance", "<grey>Successfully set <target> balance to <green><amount>$</green>.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
-    TARGET_SET_BALANCE("Target-Set-Balance", "<grey>Your balance was set to <green><amount>$</green>.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP)
+    TARGET_SET_BALANCE("Target-Set-Balance", "<grey>Your balance was set to <green><amount>$</green>.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
+    JOIN_BALANCE_ACTIONBAR("Join-Balance-Actionbar", "<gray>Your Balance: <green><amount>$", Sound.ENTITY_PLAYER_LEVELUP),
     ;
 
     private final String path;

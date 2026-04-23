@@ -91,7 +91,7 @@ public class SetBalanceSubCommand implements SubCommand {
                 target = (Player) sender;
             }
 
-            TagResolver amountTag = Placeholder.parsed("amount", String.valueOf(amount));
+            TagResolver amountTag = Placeholder.parsed("amount", String.format("%.2f", amount));
             TagResolver targetTag = Placeholder.parsed("target", target.getName());
             TagResolver selfTag = Placeholder.parsed("target", "your");
 

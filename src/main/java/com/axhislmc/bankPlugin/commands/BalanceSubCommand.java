@@ -43,7 +43,7 @@ public class BalanceSubCommand implements SubCommand {
             if (sender instanceof Player player) {
                 double balance = plugin.getEconomyManager().getBalance(player.getUniqueId());
 
-                TagResolver amountTag = Placeholder.parsed("amount", String.valueOf(balance));
+                TagResolver amountTag = Placeholder.parsed("amount", String.format("%.2f", balance));
                 plugin.getMessages().send(sender, MessageType.SHOW_BALANCE, amountTag);
             } else {
                 plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
@@ -54,8 +54,8 @@ public class BalanceSubCommand implements SubCommand {
             if (target != null) {
                 double balance = plugin.getEconomyManager().getBalance(target.getUniqueId());
 
-                TagResolver amountTag = Placeholder.parsed("amount", String.valueOf(balance));
-                plugin.getMessages().send(sender, MessageType.SHOW_BALANCE, amountTag);
+                TagResolver amountTag = Placeholder.parsed("amount", String.format("%.2f", balance));
+                plugin.getMessages().send(sender, MessageType.SHOW_OTHERS_BALANCE, amountTag);
             } else {
                 plugin.getMessages().send(sender, MessageType.PLAYER_DOESNT_EXIST);
             }

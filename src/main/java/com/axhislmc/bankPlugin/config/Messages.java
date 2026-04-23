@@ -74,4 +74,8 @@ public class Messages {
             player.playSound(player.getLocation(), messageSound, 0.5f, 1f);
         }
     }
+
+    public String getRawMessage(MessageType messageType) {
+        return messageType.getDefaultMsg();
+    }
 }
