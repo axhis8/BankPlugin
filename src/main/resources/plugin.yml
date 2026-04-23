@@ -3,7 +3,6 @@ version: '${version}'
 
 main: com.axhislmc.bankPlugin.BankPlugin
 api-version: '1.21'
-load: POSTWORLD
 
 libraries:
   - com.zaxxer:HikariCP:6.2.1

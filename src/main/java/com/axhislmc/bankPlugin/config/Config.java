@@ -20,9 +20,9 @@ public class Config {
         this.yaml = YamlConfiguration.loadConfiguration(file);
 
         this.yaml.options().setHeader(List.of(
-                "##############################",
-                "#   BankPlugin by axhislmc   #",
-                "##############################"
+                "###############################",
+                "#   BankPlugin by @axhislmc   #",
+                "###############################"
         ));
 
         register(SettingsType.values());

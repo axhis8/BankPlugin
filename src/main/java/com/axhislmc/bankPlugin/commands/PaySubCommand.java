@@ -81,6 +81,14 @@ public class PaySubCommand implements SubCommand {
                     plugin.getMessages().send(sender, MessageType.AMOUNT_IS_NEGATIVE);
                     return;
                 }
+                else if (amount < 0.01) {
+                    plugin.getMessages().send(sender, MessageType.PAY_MINIMUM);
+                    return;
+                }
+                else if (amount > 1000000000) {
+                    plugin.getMessages().send(sender, MessageType.PAY_MAXIMUM);
+                    return;
+                }
 
                 TagResolver amountTag = Placeholder.parsed("amount", String.format("%.2f", amount));
 

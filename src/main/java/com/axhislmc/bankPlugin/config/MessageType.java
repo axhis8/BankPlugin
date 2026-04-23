@@ -21,6 +21,8 @@ public enum MessageType implements ConfigEntry {
     NOT_ENOUGH_MONEY("Messages.Errors.Not-Enough-Money", "<red>You don't have enough money to pay <amount>$.", Sound.ENTITY_VILLAGER_NO),
     AMOUNT_IS_NEGATIVE("Messages.Errors.Amount-Is-Negative", "<red>Amount can't be negative.", Sound.ENTITY_VILLAGER_NO),
     SELF_PAY("Messages.Errors.Self-Pay", "<red>You can't pay yourself.", Sound.ENTITY_VILLAGER_NO),
+    PAY_MINIMUM("Messages.Errors.Min-Pay", "<red>You need to pay at least 0.01$.", Sound.ENTITY_VILLAGER_NO),
+    PAY_MAXIMUM("Messages.Errors.Max-Pay", "<red>You can only pay upto 1B$.", Sound.ENTITY_VILLAGER_NO),
 
     // INFO
     SHOW_BALANCE("Messages.Info.Show-Balance", "<grey>Your balance is: <green><amount>$</green>.", Sound.ENTITY_EXPERIENCE_ORB_PICKUP),
