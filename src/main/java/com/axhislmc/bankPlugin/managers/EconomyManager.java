@@ -1,6 +1,7 @@
 package com.axhislmc.bankPlugin.managers;
 
 import com.axhislmc.bankPlugin.BankPlugin;
+import com.axhislmc.bankPlugin.config.SettingsType;
 import org.bukkit.Bukkit;
 
 import java.util.*;
@@ -12,8 +13,6 @@ public class EconomyManager {
     private final Map<UUID, Double> cachedBalances = new HashMap<>();
     private List<Map.Entry<UUID, Double>> cachedTopList;
     private long lastTopUpdate;
-
-    private final int SHOWED_TOP_PLAYERS = 10;
 
     public EconomyManager(BankPlugin plugin) {
         this.plugin = plugin;
@@ -29,10 +28,13 @@ public class EconomyManager {
     }
 
     public List<Map.Entry<UUID, Double>> getTopBalances() {
-        long INTERVAL = 5 * 60 * 1000;
+        final long minutesInterval = plugin.getBankConfig().getInt(SettingsType.TOP_LIST_UPDATE_INTERVAL_MINUTES);
+        final long INTERVAL = minutesInterval * 60 * 1000;
 
         if(cachedTopList == null || (System.currentTimeMillis() - lastTopUpdate) > INTERVAL) {
-            this.cachedTopList = plugin.getDatabaseManager().getTopList(SHOWED_TOP_PLAYERS);
+            int amountTopPlayers = plugin.getBankConfig().getInt(SettingsType.AMOUNT_SHOW_TOP_PLAYERS);
+            this.cachedTopList = plugin.getDatabaseManager().getTopList(amountTopPlayers);
+
             this.lastTopUpdate = System.currentTimeMillis();
             plugin.getLogger().info("Updated Top Richest Players!");
         }
@@ -45,6 +47,7 @@ public class EconomyManager {
 
     public void setBalance(UUID uuid, double amount) {
         cachedBalances.put(uuid, amount);
+        lastTopUpdate = 0;
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () ->
                 plugin.getDatabaseManager().setBalance(uuid, amount)
         );

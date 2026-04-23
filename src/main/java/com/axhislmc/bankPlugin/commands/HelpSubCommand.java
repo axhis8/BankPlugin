@@ -1,6 +1,7 @@
 package com.axhislmc.bankPlugin.commands;
 
 import com.axhislmc.bankPlugin.managers.SubCommand;
+import com.axhislmc.bankPlugin.utils.BankPermission;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -9,13 +10,13 @@ import java.util.Map;
 
 public class HelpSubCommand implements SubCommand {
     private final List<Map.Entry<String, SubCommand>> subCommands;
-    private final List<SubCommand> opCommands;
+    private final List<SubCommand> adminCommands;
 
-    public HelpSubCommand(Map<String, SubCommand> subCommands, List<SubCommand> opCommands) {
+    public HelpSubCommand(Map<String, SubCommand> subCommands, List<SubCommand> adminCommands) {
         this.subCommands = new ArrayList<>(subCommands.entrySet());
         this.subCommands.sort(Map.Entry.comparingByKey());
 
-        this.opCommands = opCommands;
+        this.adminCommands = adminCommands;
     }
 
     @Override
@@ -42,12 +43,12 @@ public class HelpSubCommand implements SubCommand {
             String commandName = entry.getKey();
             SubCommand command = entry.getValue();
 
-            if (opCommands.contains(command) && !(sender.isOp())) {
+            if (adminCommands.contains(command) && !(sender.hasPermission(BankPermission.BANK_ADMIN.getPermission()))) {
                 continue;
             }
 
             String description = command.getDescription();
-            if (opCommands.contains(command)) {
+            if (adminCommands.contains(command)) {
                 description = "<red>[Admin]</red> " + description;
             }
 

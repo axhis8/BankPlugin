@@ -55,7 +55,14 @@ public class BalanceSubCommand implements SubCommand {
                 double balance = plugin.getEconomyManager().getBalance(target.getUniqueId());
 
                 TagResolver amountTag = Placeholder.parsed("amount", String.format("%.2f", balance));
-                plugin.getMessages().send(sender, MessageType.SHOW_OTHERS_BALANCE, amountTag);
+                TagResolver targetTag;
+
+                if (target == sender)
+                    targetTag = Placeholder.parsed("target", "Your");
+                else
+                    targetTag = Placeholder.parsed("target", target.getName());
+
+                plugin.getMessages().send(sender, MessageType.SHOW_OTHERS_BALANCE, targetTag, amountTag);
             } else {
                 plugin.getMessages().send(sender, MessageType.PLAYER_DOESNT_EXIST);
             }

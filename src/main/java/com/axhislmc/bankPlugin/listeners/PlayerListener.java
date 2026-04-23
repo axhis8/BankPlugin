@@ -1,13 +1,14 @@
 package com.axhislmc.bankPlugin.listeners;
 
 import com.axhislmc.bankPlugin.BankPlugin;
-import com.axhislmc.bankPlugin.config.MessageType;
-import com.axhislmc.bankPlugin.menus.BankMenuHolder;
+import com.axhislmc.bankPlugin.config.ActionBarType;
+import com.axhislmc.bankPlugin.menus.Menu;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,6 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.Inventory;
 
 public class PlayerListener implements Listener {
     private final BankPlugin plugin;
@@ -26,6 +28,7 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         final Player joinedPlayer = event.getPlayer();
+        boolean showActionbar = plugin.getBankConfig().getBoolean(ActionBarType.SHOW_BALANCE_UPON_JOIN);
 
         // Add Data to Database
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
@@ -33,25 +36,28 @@ public class PlayerListener implements Listener {
             plugin.getEconomyManager().loadPlayer(joinedPlayer.getUniqueId());
 
             // Actionbar
-            if (joinedPlayer.isOnline()) { // If Player left while the Database was loading
-                joinedPlayer.sendActionBar(MiniMessage.miniMessage().deserialize("<grey>Loading Balance..."));
+            if (joinedPlayer.isOnline() && showActionbar) { // If Player left while the Database was loading
 
+                joinedPlayer.sendActionBar(MiniMessage.miniMessage().deserialize("<grey>Loading Balance..."));
                 double balance = plugin.getEconomyManager().getBalance(joinedPlayer.getUniqueId());
+
                 actionBarOnJoin(joinedPlayer, balance);
             }
         });
     }
 
     private void actionBarOnJoin(Player player, double balance) {
+        int actionBarDelayInSeconds = plugin.getBankConfig().getInt(ActionBarType.SHOW_UPON_JOINING_DELAY_SECONDS);
+
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
 
             TagResolver amountTag = Placeholder.parsed("amount", String.format("%.2f", balance));
-            String message = plugin.getMessages().getRawMessage(MessageType.JOIN_BALANCE_ACTIONBAR);
+            String message = plugin.getBankConfig().getString(ActionBarType.TEXT);
             Component actionBarMessage = MiniMessage.miniMessage().deserialize(message, amountTag);
 
             player.sendActionBar(actionBarMessage);
-            player.playSound(player.getLocation(), MessageType.JOIN_BALANCE_ACTIONBAR.getSound(), 0.3f, 1f);
-        }, 20L); // 1 Second (Delay in ticks)
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.3f, 1f);
+        }, 20L * actionBarDelayInSeconds); // Delay in ticks
     }
 
     @EventHandler
@@ -60,9 +66,16 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
-    public void cancelTakingItemFromInventory(InventoryClickEvent event) {
-        if (event.getInventory().getHolder() instanceof BankMenuHolder) {
+    public void onClick(InventoryClickEvent event) {
+        final Inventory clickedInventory = event.getClickedInventory();
+
+        // Happens when Player clicks outside the Inventory
+        if (clickedInventory == null)
+            return;
+
+        if (clickedInventory.getHolder() instanceof final Menu menu) {
             event.setCancelled(true);
+            menu.click((Player) event.getWhoClicked(), event.getSlot());
         }
     }
 

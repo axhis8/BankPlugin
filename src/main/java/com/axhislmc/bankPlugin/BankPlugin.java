@@ -1,5 +1,6 @@
 package com.axhislmc.bankPlugin;
 
+import com.axhislmc.bankPlugin.config.Config;
 import com.axhislmc.bankPlugin.config.Messages;
 import com.axhislmc.bankPlugin.listeners.PlayerListener;
 import com.axhislmc.bankPlugin.managers.CommandManager;
@@ -13,6 +14,7 @@ public final class BankPlugin extends JavaPlugin {
 
     private EconomyManager economyManager;
     private DatabaseManager databaseManager;
+    private Config config;
     private Messages messages;
 
     @Override
@@ -26,7 +28,8 @@ public final class BankPlugin extends JavaPlugin {
     public void onEnable() {
         saveDefaultMessages();
 
-        this.messages = new Messages(this, new File(getDataFolder(), "messages.yml"));
+        this.config = new Config(this);
+        this.messages = new Messages(this);
         this.economyManager = new EconomyManager(this);
 
         CommandManager commandManager = new CommandManager(this);
@@ -52,6 +55,10 @@ public final class BankPlugin extends JavaPlugin {
         return this.messages;
     }
 
+    public Config getBankConfig() {
+        return this.config;
+    }
+
     @Override
     public void onDisable() {
         databaseManager.close();
@@ -59,9 +66,9 @@ public final class BankPlugin extends JavaPlugin {
     }
 
     private void saveDefaultMessages() {
-        File file = new File(getDataFolder(), "messages.yml");
+        File file = new File(getDataFolder(), "config.yml");
         if (!file.exists()) {
-            saveResource("messages.yml", false);
+            saveResource("config.yml", false);
         }
     }
 }

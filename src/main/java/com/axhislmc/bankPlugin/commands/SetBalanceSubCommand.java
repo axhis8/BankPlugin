@@ -4,6 +4,7 @@ import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.config.MessageType;
 import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.SubCommand;
+import com.axhislmc.bankPlugin.utils.BankPermission;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
@@ -48,7 +49,7 @@ public class SetBalanceSubCommand implements SubCommand {
 
     @Override
     public void perform(CommandSender sender, String[] args) {
-        if (!sender.isOp()) {
+        if (!sender.hasPermission(BankPermission.BANK_ADMIN.getPermission())) {
             plugin.getMessages().send(sender, MessageType.NO_PERMISSION);
         } else {
 

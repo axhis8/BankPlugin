@@ -1,6 +1,7 @@
 package com.axhislmc.bankPlugin.managers;
 
 import com.axhislmc.bankPlugin.BankPlugin;
+import com.axhislmc.bankPlugin.config.SettingsType;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.entity.Player;
 
@@ -30,8 +31,8 @@ public class DatabaseManager {
 
     private void initTables() {
         final String sql = "CREATE TABLE IF NOT EXISTS bank_accounts (" +
-                           "uuid TEXT PRIMARY KEY, " +
-                           "name TEXT, " +
+                           "uuid VARCHAR(36) PRIMARY KEY, " +
+                           "name VARCHAR(16), " +
                            "balance DOUBLE DEFAULT 0.0, " +
                            "joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
@@ -50,7 +51,7 @@ public class DatabaseManager {
     }
 
     public void addPlayerJoin(Player player) {
-        final String sql = "INSERT OR IGNORE INTO bank_accounts (uuid, name) VALUES (?, ?);";
+        final String sql = "INSERT OR IGNORE INTO bank_accounts (uuid, name, balance) VALUES (?, ?, ?);";
         final String updateName = "UPDATE bank_accounts SET name = ? WHERE uuid = ?;";
 
         try (final Connection connection = getConnection()) {
@@ -58,6 +59,7 @@ public class DatabaseManager {
             try (final PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setString(1, player.getUniqueId().toString());
                 statement.setString(2, player.getName());
+                statement.setDouble(3, plugin.getBankConfig().getDouble(SettingsType.STARTING_BALANCE));
                 statement.executeUpdate();
             }
 

@@ -4,6 +4,7 @@ import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.config.MessageType;
 import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.SubCommand;
+import com.axhislmc.bankPlugin.utils.BankPermission;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
@@ -28,7 +29,7 @@ public class PaySubCommand implements SubCommand {
 
     @Override
     public String getDescription() {
-        return "Pays a Player an amount with /bank pay <Player> <amount>";
+        return "Pays a Player with /bank pay <Player> <amount>";
     }
 
     @Override
@@ -50,6 +51,9 @@ public class PaySubCommand implements SubCommand {
         if (!(sender instanceof Player player)) {
             plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
             return;
+        }
+        else if (!(sender.hasPermission(BankPermission.BANK_PAY.getPermission()))) {
+            plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
         }
 
         // Checks if Amount is given

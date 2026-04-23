@@ -4,6 +4,7 @@ import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.commands.*;
 import com.axhislmc.bankPlugin.config.MessageType;
 import com.axhislmc.bankPlugin.menus.BankMenu;
+import com.axhislmc.bankPlugin.utils.BankPermission;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -15,7 +16,7 @@ public class CommandManager implements TabExecutor {
     private final BankPlugin plugin;
 
     private final Map<String, SubCommand> subCommands = new HashMap<>();
-    private final List<SubCommand> opCommands = new ArrayList<>();
+    private final List<SubCommand> adminCommands = new ArrayList<>();
 
     public CommandManager(BankPlugin plugin) {
         this.plugin = plugin;
@@ -26,11 +27,15 @@ public class CommandManager implements TabExecutor {
         registerSubCommand(new PaySubCommand(plugin), false);
         registerSubCommand(new SetBalanceSubCommand(plugin), true);
         registerSubCommand(new TopSubCommand(plugin), false);
-        registerSubCommand(new HelpSubCommand(subCommands, opCommands), false);
+        registerSubCommand(new HelpSubCommand(subCommands, adminCommands), false);
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender.hasPermission(BankPermission.BANK_USE.getPermission()))) {
+            plugin.getMessages().send(sender, MessageType.NO_PERMISSION);
+            return true;
+        }
 
         if (args.length > 0) {
             SubCommand target = subCommands.get(args[0].toLowerCase());
@@ -43,7 +48,7 @@ public class CommandManager implements TabExecutor {
 
         else {
             if (sender instanceof Player player) {
-                new BankMenu(plugin, player).open();
+                new BankMenu(plugin, player).open(player);
             } else {
                 plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
             }
@@ -59,7 +64,7 @@ public class CommandManager implements TabExecutor {
             List<String> completions = new ArrayList<>();
 
             for (SubCommand sub : subCommands.values()) {
-                if (opCommands.contains(sub) && !sender.isOp()) {
+                if (adminCommands.contains(sub) && !sender.hasPermission(BankPermission.BANK_ADMIN.getPermission())) {
                     continue;
                 }
                 completions.add(sub.getCommand());
@@ -88,10 +93,10 @@ public class CommandManager implements TabExecutor {
         return names;
     }
 
-    private void registerSubCommand(SubCommand sub, boolean isOp) {
+    private void registerSubCommand(SubCommand sub, boolean isAdmin) {
         subCommands.put(sub.getCommand(), sub);
-        if (isOp) {
-            opCommands.add(sub);
+        if (isAdmin) {
+            adminCommands.add(sub);
         }
     }
 }

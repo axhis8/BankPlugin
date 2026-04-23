@@ -8,6 +8,17 @@ load: POSTWORLD
 libraries:
   - com.zaxxer:HikariCP:6.2.1
 
+permissions:
+  bank.admin:
+    description: "Allows to set Balance of other Players."
+    default: op
+  bank.use:
+    description: "Allows general Usage of the Bank Plugin"
+    default: true
+  bank.pay:
+    description: "Allows to be able to pay other Players."
+    default: true
+
 commands:
   bank:
     description: Bank Plugin System to manage the Economy of your Server.
