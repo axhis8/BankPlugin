@@ -30,16 +30,31 @@ public class DatabaseManager {
     }
 
     private void initTables() {
-        final String sql = "CREATE TABLE IF NOT EXISTS bank_accounts (" +
-                           "uuid VARCHAR(36) PRIMARY KEY, " +
-                           "name VARCHAR(16), " +
-                           "balance DOUBLE DEFAULT 0.0, " +
-                           "joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
+        final String balanceSql =
+                "CREATE TABLE IF NOT EXISTS bank_accounts (" +
+                "uuid VARCHAR(36) PRIMARY KEY, " +
+                "name VARCHAR(16), " +
+                "balance DOUBLE DEFAULT 0.0, " +
+                "joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
-        try (final Connection connection = getConnection();
-             final PreparedStatement statement = connection.prepareStatement(sql)){
+        final String logSql =
+                "CREATE TABLE IF NOT EXISTS bank_logs (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "sender_uuid VARCHAR(36), " +
+                "receiver_uuid VARCHAR(36), " +
+                "amount DOUBLE, " +
+                "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);";
 
-            statement.executeUpdate();
+        try (final Connection connection = getConnection()){
+
+            try (final PreparedStatement statement = connection.prepareStatement(balanceSql)) {
+                statement.executeUpdate();
+            }
+
+            try (final PreparedStatement statement = connection.prepareStatement(logSql)) {
+                statement.executeUpdate();
+            }
+
             plugin.getLogger().info("Successfully loaded Database.");
         } catch (SQLException e) {
             plugin.getLogger().severe(e.getMessage());
@@ -92,6 +107,66 @@ public class DatabaseManager {
         }
 
         return 0.0;
+    }
+
+    public void logTransaction(UUID sender, UUID receiver, double amount) {
+        final String sql = "INSERT INTO bank_logs (sender_uuid, receiver_uuid, amount) VALUES (?, ?, ?);";
+
+        try (Connection connection = getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, sender.toString());
+            statement.setString(2, receiver.toString());
+            statement.setDouble(3, amount);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            plugin.getLogger().severe(e.getMessage());
+        }
+    }
+
+    public boolean transfer(UUID sender, UUID receiver, double amount) {
+        final String removeMoneySql = "UPDATE bank_accounts SET balance = balance - ? WHERE uuid = ?;";
+        final String addMoneySql = "UPDATE bank_accounts SET balance = balance + ? WHERE uuid = ?;";
+
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement statement = connection.prepareStatement(removeMoneySql)) {
+                statement.setDouble(1, amount);
+                statement.setString(2, sender.toString());
+                statement.executeUpdate();
+            }
+
+            try (PreparedStatement statement = connection.prepareStatement(addMoneySql)) {
+                statement.setDouble(1, amount);
+                statement.setString(2, receiver.toString());
+                statement.executeUpdate();
+            }
+
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    plugin.getLogger().warning("Transfer failed! Rollback triggered for: " + sender + " -> " + receiver);
+                } catch (SQLException ex) {
+                    plugin.getLogger().severe("CRITICAL: Rollback failed! " + ex.getMessage());
+                }
+            }
+            plugin.getLogger().severe("Database Error during transfer: " + e.getMessage());
+            return false;
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    plugin.getLogger().severe(e.getMessage());
+                }
+            }
+        }
     }
 
     public void setBalance(UUID uuid, double amount) {

@@ -37,11 +37,13 @@ public class PlayerListener implements Listener {
 
             // Actionbar
             if (joinedPlayer.isOnline() && showActionbar) { // If Player left while the Database was loading
-
-                joinedPlayer.sendActionBar(MiniMessage.miniMessage().deserialize("<grey>Loading Balance..."));
                 double balance = plugin.getEconomyManager().getBalance(joinedPlayer.getUniqueId());
 
-                actionBarOnJoin(joinedPlayer, balance);
+                // Run UIs back in Main Thread
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    joinedPlayer.sendActionBar(MiniMessage.miniMessage().deserialize("<grey>Loading Balance..."));
+                    actionBarOnJoin(joinedPlayer, balance);
+                });
             }
         });
     }
@@ -81,6 +83,6 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public void removeColonCommand(PlayerCommandSendEvent event) {
-        event.getCommands().remove("bankplugin:bank");
+        event.getCommands().remove(plugin.getName().toLowerCase() + ":bank");
     }
 }

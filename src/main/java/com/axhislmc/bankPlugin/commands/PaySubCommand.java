@@ -53,7 +53,8 @@ public class PaySubCommand implements SubCommand {
             return;
         }
         else if (!(sender.hasPermission(BankPermission.BANK_PAY.getPermission()))) {
-            plugin.getMessages().send(sender, MessageType.NOT_A_PLAYER);
+            plugin.getMessages().send(sender, MessageType.NO_PERMISSION);
+            return;
         }
 
         // Checks if Amount is given
@@ -77,7 +78,7 @@ public class PaySubCommand implements SubCommand {
                 double amount = Double.parseDouble(args[2]);
 
                 // Checks valid Amount
-                if (amount <= 0) {
+                if (amount < 0) {
                     plugin.getMessages().send(sender, MessageType.AMOUNT_IS_NEGATIVE);
                     return;
                 }
@@ -93,14 +94,13 @@ public class PaySubCommand implements SubCommand {
                 TagResolver amountTag = Placeholder.parsed("amount", String.format("%.2f", amount));
 
                 // Checks the Transfer
-                if (plugin.getEconomyManager().removeMoney(player.getUniqueId(), amount)) {
-                    plugin.getEconomyManager().addMoney(target.getUniqueId(), amount);
+                if (plugin.getEconomyManager().transferMoney(player.getUniqueId(), target.getUniqueId(), amount)) {
 
                     TagResolver targetTag = Placeholder.parsed("target", target.getName());
                     TagResolver playerTag = Placeholder.parsed("player", sender.getName());
 
                     plugin.getMessages().send(sender, MessageType.MONEY_TRANSFERRED, amountTag, targetTag);
-                    plugin.getMessages().send(sender, MessageType.MONEY_RECEIVED, amountTag, playerTag);
+                    plugin.getMessages().send(target, MessageType.MONEY_RECEIVED, amountTag, playerTag);
 
                 } else {
                     plugin.getMessages().send(sender, MessageType.NOT_ENOUGH_MONEY, amountTag);

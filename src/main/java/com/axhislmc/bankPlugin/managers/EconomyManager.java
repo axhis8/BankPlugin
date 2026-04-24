@@ -53,16 +53,28 @@ public class EconomyManager {
         );
     }
 
-    public void addMoney(UUID uuid, double amount) {
-        setBalance(uuid, getBalance(uuid) + amount);
-    }
-
-    public boolean removeMoney(UUID uuid, double amount) {
-        double currentBalance = getBalance(uuid);
-        if (currentBalance < amount) {
+    public boolean transferMoney(UUID sender, UUID receiver, double amount) {
+        if (getBalance(sender) < amount) {
             return false;
         }
-        setBalance(uuid, currentBalance - amount);
+
+        double oldSenderBalance = getBalance(sender);
+        double oldReceiverBalance = getBalance(receiver);
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            boolean success = plugin.getDatabaseManager().transfer(sender, receiver, amount);
+            if (success) {
+                plugin.getDatabaseManager().logTransaction(sender, receiver, amount);
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    if (cachedBalances.containsKey(sender))
+                        cachedBalances.put(sender, oldSenderBalance - amount);
+
+                    if (cachedBalances.containsKey(receiver))
+                        cachedBalances.put(receiver, oldReceiverBalance + amount);
+
+                });
+            }
+        });
+
         return true;
     }
 }
