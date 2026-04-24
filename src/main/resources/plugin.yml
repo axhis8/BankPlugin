@@ -9,6 +9,7 @@ libraries:
 
 softdepend:
   - Vault
+  - PlaceholderAPI
 
 permissions:
   bank.admin:

@@ -1,5 +1,6 @@
 package com.axhislmc.bankPlugin;
 
+import com.axhislmc.bankPlugin.api.PlaceholderManager;
 import com.axhislmc.bankPlugin.config.Config;
 import com.axhislmc.bankPlugin.config.Messages;
 import com.axhislmc.bankPlugin.listeners.PlayerListener;
@@ -36,6 +37,11 @@ public final class BankPlugin extends JavaPlugin {
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
             this.vaultManager = new VaultManager(this);
             this.vaultManager.register();
+        }
+
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            new PlaceholderManager(this).register();
+            getLogger().info("PlaceholderAPI registered.");
         }
 
         CommandManager commandManager = new CommandManager(this);
