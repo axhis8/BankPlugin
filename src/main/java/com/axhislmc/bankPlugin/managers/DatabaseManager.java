@@ -2,6 +2,7 @@ package com.axhislmc.bankPlugin.managers;
 
 import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.config.SettingsType;
+import com.axhislmc.bankPlugin.model.PlayerBalance;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.entity.Player;
 
@@ -183,8 +184,8 @@ public class DatabaseManager {
         }
     }
 
-    public List<Map.Entry<UUID, Double>> getTopList(int limit) {
-        List<Map.Entry<UUID, Double>> topList = new ArrayList<>();
+    public List<PlayerBalance> getTopList(int limit) {
+        List<PlayerBalance> topList = new ArrayList<>();
 
         final String sql = "SELECT uuid, balance FROM bank_accounts ORDER BY balance DESC LIMIT ?";
 
@@ -198,7 +199,7 @@ public class DatabaseManager {
                         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
                         double balance = resultSet.getDouble("balance");
 
-                        topList.add(new AbstractMap.SimpleEntry<>(uuid, balance));
+                        topList.add(new PlayerBalance(uuid, balance));
                     } catch (IllegalArgumentException e) {
                         plugin.getLogger().severe(e.getMessage());
                     }

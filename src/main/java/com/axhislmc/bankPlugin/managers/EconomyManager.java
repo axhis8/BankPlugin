@@ -2,6 +2,7 @@ package com.axhislmc.bankPlugin.managers;
 
 import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.config.SettingsType;
+import com.axhislmc.bankPlugin.model.PlayerBalance;
 import org.bukkit.Bukkit;
 
 import java.util.*;
@@ -11,7 +12,7 @@ public class EconomyManager {
     private final BankPlugin plugin;
 
     private final Map<UUID, Double> cachedBalances = new HashMap<>();
-    private List<Map.Entry<UUID, Double>> cachedTopList;
+    private List<PlayerBalance> cachedTopList;
     private long lastTopUpdate;
 
     public EconomyManager(BankPlugin plugin) {
@@ -27,7 +28,7 @@ public class EconomyManager {
         cachedBalances.remove(uuid);
     }
 
-    public List<Map.Entry<UUID, Double>> getTopBalances() {
+    public List<PlayerBalance> getTopBalances() {
         final long minutesInterval = plugin.getBankConfig().getInt(SettingsType.TOP_LIST_UPDATE_INTERVAL_MINUTES);
         final long INTERVAL = minutesInterval * 60 * 1000;
 

@@ -1,6 +1,8 @@
 package com.axhislmc.bankPlugin.menus;
 
 import com.axhislmc.bankPlugin.BankPlugin;
+import com.axhislmc.bankPlugin.config.SettingsType;
+import com.axhislmc.bankPlugin.model.PlayerBalance;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Material;
@@ -10,8 +12,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class BankMenu extends BaseMenu {
     private final BankPlugin plugin;
@@ -75,17 +75,20 @@ public class BankMenu extends BaseMenu {
         topItemMetaData.displayName(mm("<!i><b><dark_green>Top Players"));
 
         List<Component> topItemLore = new ArrayList<>();
-        List<Map.Entry<UUID, Double>> balanceTopList = plugin.getEconomyManager().getTopBalances();
-        int limit = Math.min(10, balanceTopList.size());
+        List<PlayerBalance> balanceTopList = plugin.getEconomyManager().getTopBalances();
+        int limit = Math.min(plugin.getBankConfig().getInt(SettingsType.AMOUNT_SHOW_TOP_PLAYERS), balanceTopList.size());
 
-        for (int i = 0; i < limit; i++) {
-            Map.Entry<UUID, Double> entry = balanceTopList.get(i);
-            if (entry == null || entry.getKey() == null) continue;
+        int idx = 1;
+        for (PlayerBalance playerBalance : balanceTopList) {
+            if (playerBalance == null || playerBalance.uuid() == null) continue;
 
-            String playerName = plugin.getServer().getOfflinePlayer(entry.getKey()).getName();
+            String playerName = plugin.getServer().getOfflinePlayer(playerBalance.uuid()).getName();
             if (playerName == null) playerName = "Unknown";
 
-            topItemLore.add(mm(String.format("<!i><grey>%d. <white>%s<white>: <green>%.2f$", (i + 1), playerName, entry.getValue())));
+            topItemLore.add(mm(String.format("<!i><grey>%d. <white>%s<white>: <green>%.2f$", idx, playerName, playerBalance.balance())));
+            idx++;
+            if (idx > limit)
+                break;
         }
 
         topItemMetaData.lore(topItemLore);

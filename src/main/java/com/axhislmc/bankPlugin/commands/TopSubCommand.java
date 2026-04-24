@@ -2,6 +2,7 @@ package com.axhislmc.bankPlugin.commands;
 
 import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.managers.SubCommand;
+import com.axhislmc.bankPlugin.model.PlayerBalance;
 import org.bukkit.command.CommandSender;
 
 import java.util.*;
@@ -30,18 +31,19 @@ public class TopSubCommand implements SubCommand {
 
     @Override
     public void perform(CommandSender sender, String[] args) {
-        List<Map.Entry<UUID, Double>> balanceTopList = plugin.getEconomyManager().getTopBalances();
+        List<PlayerBalance> balanceTopList = plugin.getEconomyManager().getTopBalances();
 
         int limit = Math.min(10, balanceTopList.size());
         sender.sendRichMessage("<grey><bold>-- <yellow>Top " + limit + " richest Players</yellow> --");
 
-        for (int i = 0; i < limit; i++) {
-            Map.Entry<UUID, Double> entry = balanceTopList.get(i);
-
-            String playerName = plugin.getServer().getOfflinePlayer(entry.getKey()).getName();
+        int idx = 1;
+        for (PlayerBalance playerBalance : balanceTopList) {
+            String playerName = plugin.getServer().getOfflinePlayer(playerBalance.uuid()).getName();
             if (playerName == null) playerName = "Unknown";
 
-            sender.sendRichMessage(String.format("<grey>%d. <white>%s<white>: <green>%.2f$", (i + 1), playerName, entry.getValue()));
+            sender.sendRichMessage(String.format("<grey>%d. <white>%s<white>: <green>%.2f$",
+                    idx, playerName, playerBalance.balance()));
+            idx++;
         }
     }
 }
