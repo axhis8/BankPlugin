@@ -6,6 +6,7 @@ import com.axhislmc.bankPlugin.listeners.PlayerListener;
 import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.DatabaseManager;
 import com.axhislmc.bankPlugin.managers.EconomyManager;
+import com.axhislmc.bankPlugin.api.VaultManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -14,6 +15,7 @@ public final class BankPlugin extends JavaPlugin {
 
     private EconomyManager economyManager;
     private DatabaseManager databaseManager;
+    private VaultManager vaultManager;
     private Config config;
     private Messages messages;
 
@@ -21,7 +23,6 @@ public final class BankPlugin extends JavaPlugin {
     public void onLoad() {
         this.databaseManager = new DatabaseManager(this);
         databaseManager.load();
-
     }
 
     @Override
@@ -31,6 +32,11 @@ public final class BankPlugin extends JavaPlugin {
         this.config = new Config(this);
         this.messages = new Messages(this);
         this.economyManager = new EconomyManager(this);
+
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            this.vaultManager = new VaultManager(this);
+            this.vaultManager.register();
+        }
 
         CommandManager commandManager = new CommandManager(this);
         commandManager.setupCommands();
@@ -61,6 +67,7 @@ public final class BankPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (vaultManager != null) vaultManager.unregister();
         databaseManager.close();
         getLogger().info("Safely disabled Bank Plugin.");
     }

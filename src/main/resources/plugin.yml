@@ -7,6 +7,9 @@ api-version: '1.21'
 libraries:
   - com.zaxxer:HikariCP:6.2.1
 
+softdepend:
+  - Vault
+
 permissions:
   bank.admin:
     description: "Allows to set Balance of other Players."

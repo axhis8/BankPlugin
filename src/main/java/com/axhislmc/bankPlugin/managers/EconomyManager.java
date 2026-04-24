@@ -78,4 +78,14 @@ public class EconomyManager {
 
         return true;
     }
+
+    public void addMoney(UUID uuid, double amount) {
+        setBalance(uuid, getBalance(uuid) + amount);
+    }
+
+    public boolean removeMoney(UUID uuid, double amount) {
+        if (getBalance(uuid) < amount) return false;
+        setBalance(uuid, getBalance(uuid) - amount);
+        return true;
+    }
 }
