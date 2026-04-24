@@ -2,6 +2,7 @@ package com.axhislmc.bankPlugin.commands;
 
 import com.axhislmc.bankPlugin.BankPlugin;
 import com.axhislmc.bankPlugin.config.MessageType;
+import com.axhislmc.bankPlugin.config.SettingsType;
 import com.axhislmc.bankPlugin.managers.CommandManager;
 import com.axhislmc.bankPlugin.managers.SubCommand;
 import com.axhislmc.bankPlugin.utils.BankPermission;
@@ -82,11 +83,11 @@ public class PaySubCommand implements SubCommand {
                     plugin.getMessages().send(sender, MessageType.AMOUNT_IS_NEGATIVE);
                     return;
                 }
-                else if (amount < 0.01) {
+                else if (amount < plugin.getBankConfig().getDouble(SettingsType.MIN_AMOUNT_PAY)) {
                     plugin.getMessages().send(sender, MessageType.PAY_MINIMUM);
                     return;
                 }
-                else if (amount > 1000000000) {
+                else if (amount > plugin.getBankConfig().getDouble(SettingsType.MAX_AMOUNT_PAY)) {
                     plugin.getMessages().send(sender, MessageType.PAY_MAXIMUM);
                     return;
                 }
