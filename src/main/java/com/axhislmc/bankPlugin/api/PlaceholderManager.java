@@ -20,7 +20,7 @@ public class PlaceholderManager extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getAuthor() {
-        return "axhislmc";
+        return String.join(", ", plugin.getPluginMeta().getAuthors());
     }
 
     @Override

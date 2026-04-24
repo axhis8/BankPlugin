@@ -34,6 +34,14 @@ public final class BankPlugin extends JavaPlugin {
         this.messages = new Messages(this);
         this.economyManager = new EconomyManager(this);
 
+        CommandManager commandManager = new CommandManager(this);
+        commandManager.setupCommands();
+
+        getCommand("bank").setExecutor(commandManager);
+        getCommand("bank").setTabCompleter(commandManager);
+
+        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
             this.vaultManager = new VaultManager(this);
             this.vaultManager.register();
@@ -43,14 +51,6 @@ public final class BankPlugin extends JavaPlugin {
             new PlaceholderManager(this).register();
             getLogger().info("PlaceholderAPI registered.");
         }
-
-        CommandManager commandManager = new CommandManager(this);
-        commandManager.setupCommands();
-
-        getCommand("bank").setExecutor(commandManager);
-        getCommand("bank").setTabCompleter(commandManager);
-
-        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
         getLogger().info("Successfully started Bank Plugin.");
     }

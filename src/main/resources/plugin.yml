@@ -1,4 +1,5 @@
 name: BankPlugin
+author: axhislmc
 version: '${version}'
 
 main: com.axhislmc.bankPlugin.BankPlugin
@@ -7,9 +8,14 @@ api-version: '1.21'
 libraries:
   - com.zaxxer:HikariCP:6.2.1
 
-softdepend:
-  - Vault
-  - PlaceholderAPI
+dependencies:
+  server:
+    PlaceholderAPI:
+      load: AFTER
+      required: false
+    VaultAPI:
+      load: AFTER
+      required: false
 
 permissions:
   bank.admin:
