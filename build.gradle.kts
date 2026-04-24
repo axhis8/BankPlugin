@@ -19,6 +19,20 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
         exclude(group = "org.bukkit", module = "bukkit")
     }
+
+    testImplementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.mockito:mockito-core:5.8.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.8.0")
+
+    testImplementation("me.clip:placeholderapi:2.11.6")
+    testImplementation("com.zaxxer:HikariCP:6.2.1")
+    testImplementation("com.github.MilkBowl:VaultAPI:1.7") {
+        exclude(group = "org.bukkit", module = "bukkit")
+    }
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 java {
@@ -39,5 +53,9 @@ tasks {
         filesMatching("plugin.yml") {
             expand(props)
         }
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }

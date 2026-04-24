@@ -43,7 +43,10 @@ public class EconomyManager {
     }
 
     public double getBalance(UUID uuid) {
-        return cachedBalances.getOrDefault(uuid, plugin.getDatabaseManager().getBalance(uuid));
+        if (cachedBalances.containsKey(uuid)) {
+            return cachedBalances.get(uuid);
+        }
+        return plugin.getDatabaseManager().getBalance(uuid);
     }
 
     public void setBalance(UUID uuid, double amount) {
