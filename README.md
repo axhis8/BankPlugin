@@ -10,6 +10,8 @@ The goal was to build something production-ready, not just a simple tutorial pro
 
 - Java 21 or later
 - Paper 1.21 or later
+- Vault (optional, for economy integration with other plugins)
+- PlaceholderAPI (optional, for placeholders in scoreboards etc.)
 
 ## Features
 
@@ -24,6 +26,8 @@ The goal was to build something production-ready, not just a simple tutorial pro
 - Async database operations to prevent server lag on DB reads/writes
 - Balance caching with no unnecessary database calls
 - SubCommand architecture for clean `/bank` command handling
+- Vault integration for compatibility with other economy plugins
+- PlaceholderAPI support — use `%bankplugin_balance%` in scoreboards, tab lists and more
 
 ## Installation
 
@@ -34,23 +38,32 @@ The goal was to build something production-ready, not just a simple tutorial pro
 
 No database setup required, as SQLite creates itself automatically on first launch.
 
+Optionally drop [Vault](https://www.spigotmc.org/resources/vault.34315/) and [PlaceholderAPI](https://www.spigotmc.org/resources/placeholderapi.6245/) in your `plugins/` folder for extended compatibility.
+
 ## Commands
 
-| Command | Description                       |
-|---|-----------------------------------|
-| `/bank balance` | Shows your current balance        |
+| Command | Description |
+|---|---|
+| `/bank balance` | Shows your current balance |
 | `/bank pay <Player> <amount>` | Transfers money to another player |
-| `/bank top` | Shows the top richest players     |
-| `/bank setbalance <Player> <amount>` | Sets a player's balance (admin)   |
-| `/bank help` | Shows all available commands      |
+| `/bank top` | Shows the top richest players |
+| `/bank setbalance <Player> <amount>` | Sets a player's balance (admin) |
+| `/bank help` | Shows all available commands |
 
 ## Permissions
 
-| Permission         | Description                  |
-|--------------------|------------------------------|
-| `bankplugin.use`   | Use Bank Commands            |
-| `bankplugin.pay`   | Send money to another player |
-| `bankplugin.admin` | Admin commands (setbalance)  |
+| Permission | Description |
+|---|---|
+| `bankplugin.use` | Use Bank Commands |
+| `bankplugin.pay` | Send money to another player |
+| `bankplugin.admin` | Admin commands (setbalance) |
+
+## Placeholders
+
+| Placeholder | Description |
+|---|---|
+| `%bankplugin_balance%` | Player's current balance |
+| `%bankplugin_balance_formatted%` | Player's balance formatted with $ |
 
 ## Configuration
 
@@ -81,6 +94,8 @@ All messages support MiniMessage formatting for colors and styles.
 - SQLite + HikariCP (Connection Pooling)
 - Gradle (Kotlin DSL)
 - Adventure / MiniMessage (Text formatting)
+- Vault API
+- PlaceholderAPI
 
 ## What I Learned
 
@@ -93,3 +108,4 @@ All messages support MiniMessage formatting for colors and styles.
 - Enum-based config and message systems to avoid hardcoding
 - Java Records for clean data models
 - Separating concerns across packages: commands, managers, listeners, menus, config, model, utils
+- Integrating external APIs (Vault, PlaceholderAPI)
